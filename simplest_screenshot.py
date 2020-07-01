@@ -1,7 +1,10 @@
 from selenium import webdriver
+import time
 
 if __name__ == "__main__":
-    url = 'https://www.yandex.ru'
+    url = 'https://www.python.org'
+    window_size_x = 1900
+    window_size_y = 1080
 
     options = webdriver.ChromeOptions()
     options.add_argument(
@@ -12,12 +15,33 @@ if __name__ == "__main__":
     options.add_argument("disable-infobars")
     options.add_argument("--disable-extensions")
     options.add_argument("--disable-notifications")
-    options.add_argument('--window-size=1920,1080')
+    options.add_argument(f'--window-size={window_size_x},{window_size_y}')
     driver = webdriver.Chrome(options=options)
+    driver.set_page_load_timeout(1000)
 
-    driver.set_page_load_timeout(100000)
     driver.get(url)
+    # driver.save_screenshot("screenshots/my_screenshot.png")
 
-    driver.save_screenshot("screenshots/my_screenshot.png")
+    SCROLL_PAUSE_TIME = 4
+    i = 0
+
+    # Get scroll height
+    height_delta = 1080
+    last_height = 1080
+    max_height = driver.execute_script("return document.body.scrollHeight")
+    while True:
+        # Scroll down to bottom
+        driver.save_screenshot(f"screenshots/screenshot{i}.png")
+        driver.execute_script(f"window.scrollTo(0, {last_height});")
+        i += 1
+        # Wait to load page
+        time.sleep(SCROLL_PAUSE_TIME)
+
+        # Calculate new scroll height and compare with last scroll height
+        new_height = last_height + height_delta
+        if max_height < new_height:
+            driver.save_screenshot(f"screenshots/screenshot{i}.png")
+            break
+        last_height = new_height
 
     driver.quit()
