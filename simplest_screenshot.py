@@ -24,6 +24,7 @@ if __name__ == "__main__":
     driver.get(url)
 
     SCROLL_PAUSE_TIME = 4
+    FOLDER_NAME = 'screenshots'
     i = 0
 
     # Get scroll height
@@ -31,16 +32,19 @@ if __name__ == "__main__":
     last_height = 1080
     max_height = driver.execute_script("return document.body.scrollHeight")
 
-    if not os.path.exists('screenshots'):
+    if os.path.exists(FOLDER_NAME):
+        for file_name in os.listdir(FOLDER_NAME):
+            os.remove(f"{FOLDER_NAME}/{file_name}")
+    else:
         try:
-            os.mkdir('screenshots')
+            os.mkdir(FOLDER_NAME)
         except OSError:
-            print("Создать директорию 'screenshots' не удалось")
+            print(f"Создать директорию '{FOLDER_NAME}' не удалось")
             exit()
 
     while True:
         # Scroll down to bottom
-        driver.save_screenshot(f"screenshots/screenshot{i}.png")
+        driver.save_screenshot(f"{FOLDER_NAME}/screenshot{i}.png")
         driver.execute_script(f"window.scrollTo(0, {last_height});")
         i += 1
         # Wait to load page
@@ -49,7 +53,7 @@ if __name__ == "__main__":
         # Calculate new scroll height and compare with last scroll height
         new_height = last_height + height_delta
         if max_height < new_height:
-            driver.save_screenshot(f"screenshots/screenshot{i}.png")
+            driver.save_screenshot(f"{FOLDER_NAME}/screenshot{i}.png")
             break
         last_height = new_height
 
