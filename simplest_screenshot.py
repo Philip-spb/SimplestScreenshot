@@ -1,5 +1,7 @@
-from selenium import webdriver
+import os
 import time
+
+from selenium import webdriver
 
 if __name__ == "__main__":
     url = 'https://www.python.org'
@@ -20,7 +22,6 @@ if __name__ == "__main__":
     driver.set_page_load_timeout(1000)
 
     driver.get(url)
-    # driver.save_screenshot("screenshots/my_screenshot.png")
 
     SCROLL_PAUSE_TIME = 4
     i = 0
@@ -29,6 +30,14 @@ if __name__ == "__main__":
     height_delta = 1080
     last_height = 1080
     max_height = driver.execute_script("return document.body.scrollHeight")
+
+    if not os.path.exists('screenshots'):
+        try:
+            os.mkdir('screenshots')
+        except OSError:
+            print("Создать директорию 'screenshots' не удалось")
+            exit()
+
     while True:
         # Scroll down to bottom
         driver.save_screenshot(f"screenshots/screenshot{i}.png")
@@ -45,3 +54,6 @@ if __name__ == "__main__":
         last_height = new_height
 
     driver.quit()
+
+# + Добавить создание папки screenshots в корне (если она отсустсвует)
+# - Добавить удаление всех файлов скриншотов из папки screenshots (если такие файлы есть)
