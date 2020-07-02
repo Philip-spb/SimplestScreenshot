@@ -1,5 +1,6 @@
 import os
 import time
+import cv2
 
 from selenium import webdriver
 
@@ -59,5 +60,14 @@ if __name__ == "__main__":
 
     driver.quit()
 
+    # Склеиваем скриншоты
+    img_list = list(map(lambda x: f'{FOLDER_NAME}/'+x, os.listdir(FOLDER_NAME)))
+    images = list(map(cv2.imread, sorted(img_list)))
+
+    im_v = cv2.vconcat(images)
+    cv2.imwrite('test.jpg', im_v)
+
 # + Добавить создание папки screenshots в корне (если она отсустсвует)
-# - Добавить удаление всех файлов скриншотов из папки screenshots (если такие файлы есть)
+# + Добавить удаление всех файлов скриншотов из папки screenshots (если такие файлы есть)
+# + Склеить полученные файлы
+# Обрезать последний файл
