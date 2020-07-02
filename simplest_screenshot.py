@@ -4,6 +4,12 @@ import cv2
 
 from selenium import webdriver
 
+
+def clear_folder(folder_name):
+    for file_name in os.listdir(folder_name):
+        os.remove(f"{folder_name}/{file_name}")
+
+
 if __name__ == "__main__":
     url = 'https://www.python.org'
     window_size_x = 1900
@@ -34,8 +40,7 @@ if __name__ == "__main__":
     max_height = driver.execute_script("return document.body.scrollHeight")
 
     if os.path.exists(FOLDER_NAME):
-        for file_name in os.listdir(FOLDER_NAME):
-            os.remove(f"{FOLDER_NAME}/{file_name}")
+        clear_folder(FOLDER_NAME)
     else:
         try:
             os.mkdir(FOLDER_NAME)
@@ -61,13 +66,15 @@ if __name__ == "__main__":
     driver.quit()
 
     # Склеиваем скриншоты
-    img_list = list(map(lambda x: f'{FOLDER_NAME}/'+x, os.listdir(FOLDER_NAME)))
+    img_list = list(map(lambda x: f'{FOLDER_NAME}/' + x, os.listdir(FOLDER_NAME)))
     images = list(map(cv2.imread, sorted(img_list)))
-
     im_v = cv2.vconcat(images)
-    cv2.imwrite('test.jpg', im_v)
+    clear_folder(FOLDER_NAME)
+    cv2.imwrite(f'{FOLDER_NAME}/screenshot.jpg', im_v)
 
 # + Добавить создание папки screenshots в корне (если она отсустсвует)
 # + Добавить удаление всех файлов скриншотов из папки screenshots (если такие файлы есть)
 # + Склеить полученные файлы
 # Обрезать последний файл
+
+
