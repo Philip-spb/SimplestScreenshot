@@ -11,9 +11,9 @@ def clear_folder(folder_name):
 
 
 if __name__ == "__main__":
-    url = 'https://www.python.org'
-    window_size_x = 1900
-    window_size_y = 1080
+    url = 'http://vk.com/@mrhostel-ansambl-centralnyh-ploschadei'
+    window_size_x = 950
+    window_size_y = 540
 
     options = webdriver.ChromeOptions()
     options.add_argument(
@@ -26,18 +26,24 @@ if __name__ == "__main__":
     options.add_argument("--disable-notifications")
     options.add_argument(f'--window-size={window_size_x},{window_size_y}')
     driver = webdriver.Chrome(options=options)
-    driver.set_page_load_timeout(1000)
+    driver.set_page_load_timeout(10)
 
     driver.get(url)
 
-    SCROLL_PAUSE_TIME = 4
+    SCROLL_PAUSE_TIME = 2
     FOLDER_NAME = 'screenshots'
     i = 0
 
-    # Get scroll height
-    height_delta = 1080
-    last_height = 1080
+    # Получаем максимально возможную глубину прокрутки
+    height_delta = window_size_y
+    last_height = window_size_y
     max_height = driver.execute_script("return document.body.scrollHeight")
+
+    last_screen_height = max_height - int(max_height / window_size_y) * window_size_y
+
+    print(max_height)
+    print('Всего целых экранов: ', int(max_height / window_size_y))
+    print('Высота последнего экрана: ', last_screen_height)
 
     if os.path.exists(FOLDER_NAME):
         clear_folder(FOLDER_NAME)
@@ -49,32 +55,26 @@ if __name__ == "__main__":
             exit()
 
     while True:
-        # Scroll down to bottom
-        driver.save_screenshot(f"{FOLDER_NAME}/screenshot{i}.png")
+        # Прокручиваем экран сверху вниз
+        driver.save_screenshot(f"{FOLDER_NAME}/{i}.png")
         driver.execute_script(f"window.scrollTo(0, {last_height});")
         i += 1
-        # Wait to load page
         time.sleep(SCROLL_PAUSE_TIME)
 
-        # Calculate new scroll height and compare with last scroll height
+        # Вычисляем ткущую высоту после прокрутки и сравниваем с максимально возможно прокруткой
         new_height = last_height + height_delta
         if max_height < new_height:
-            driver.save_screenshot(f"{FOLDER_NAME}/screenshot{i}.png")
+            driver.save_screenshot(f"{FOLDER_NAME}/{i}.png")
             break
         last_height = new_height
 
     driver.quit()
 
     # Склеиваем скриншоты
-    img_list = list(map(lambda x: f'{FOLDER_NAME}/' + x, os.listdir(FOLDER_NAME)))
-    images = list(map(cv2.imread, sorted(img_list)))
+    img_list = list(map(lambda x: f'{FOLDER_NAME}/{x}.png', range(i + 1)))
+    images = list(map(cv2.imread, img_list))
+    # Обрезаем последний скриншот
+    images[-1] = images[-1][(window_size_y - last_screen_height) * 2:]
     im_v = cv2.vconcat(images)
     clear_folder(FOLDER_NAME)
     cv2.imwrite(f'{FOLDER_NAME}/screenshot.jpg', im_v)
-
-# + Добавить создание папки screenshots в корне (если она отсустсвует)
-# + Добавить удаление всех файлов скриншотов из папки screenshots (если такие файлы есть)
-# + Склеить полученные файлы
-# Обрезать последний файл
-
-
