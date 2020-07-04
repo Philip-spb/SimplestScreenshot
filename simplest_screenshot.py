@@ -11,7 +11,7 @@ def clear_folder(folder_name):
 
 
 if __name__ == "__main__":
-    url = 'http://vk.com/@mrhostel-ansambl-centralnyh-ploschadei'
+    url = 'http://www.hostelvariant.ru'
     window_size_x = 950
     window_size_y = 540
 
@@ -26,11 +26,11 @@ if __name__ == "__main__":
     options.add_argument("--disable-notifications")
     options.add_argument(f'--window-size={window_size_x},{window_size_y}')
     driver = webdriver.Chrome(options=options)
-    driver.set_page_load_timeout(10)
+    driver.set_page_load_timeout(100)
 
     driver.get(url)
 
-    SCROLL_PAUSE_TIME = 2
+    SCROLL_PAUSE_TIME = 4
     FOLDER_NAME = 'screenshots'
     i = 0
 
