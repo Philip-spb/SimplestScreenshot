@@ -5,15 +5,43 @@ import cv2
 from selenium import webdriver
 
 
-def clear_folder(folder_name):
-    for file_name in os.listdir(folder_name):
-        os.remove(f"{folder_name}/{file_name}")
+class FsMethods:
+    def __init__(self, folder_name='screenshots'):
+        self.folder_name = folder_name
+
+    def clear_folder(self):
+        for file_name in os.listdir(self.folder_name):
+            os.remove(f"{self.folder_name}/{file_name}")
+
+    def path_exist(self):
+        return os.path.exists(self.folder_name)
+
+    def create_clear_folder(self):
+        if self.path_exist():
+            self.clear_folder()
+        else:
+            try:
+                os.mkdir(self.folder_name)
+            except OSError:
+                print(f"Создать директорию '{self.folder_name}' не удалось")
+                exit()
+
+    def image_bonding(self, img_num, scroll_height, last_screen_height):
+        img_list = list(map(lambda x: f'{self.folder_name}/{x}.png', range(img_num + 1)))
+        images = list(map(cv2.imread, img_list))
+        # Обрезаем последний скриншот
+        images[-1] = images[-1][(scroll_height- last_screen_height) * 2:]
+        im_v = cv2.vconcat(images)
+        self.clear_folder()
+        cv2.imwrite(f'{self.folder_name}/screenshot.jpg', im_v)
 
 
 if __name__ == "__main__":
-    url = 'http://www.hostelvariant.ru'
+    url = 'https://www.mrhostel.ru'
     window_size_x = 950
     window_size_y = 540
+
+    screen_shot = FsMethods()
 
     options = webdriver.ChromeOptions()
     options.add_argument(
@@ -45,14 +73,7 @@ if __name__ == "__main__":
     print('Всего целых экранов: ', int(max_height / window_size_y))
     print('Высота последнего экрана: ', last_screen_height)
 
-    if os.path.exists(FOLDER_NAME):
-        clear_folder(FOLDER_NAME)
-    else:
-        try:
-            os.mkdir(FOLDER_NAME)
-        except OSError:
-            print(f"Создать директорию '{FOLDER_NAME}' не удалось")
-            exit()
+    screen_shot.create_clear_folder()
 
     while True:
         # Прокручиваем экран сверху вниз
@@ -61,7 +82,7 @@ if __name__ == "__main__":
         i += 1
         time.sleep(SCROLL_PAUSE_TIME)
 
-        # Вычисляем ткущую высоту после прокрутки и сравниваем с максимально возможно прокруткой
+        # Вычисляем текущую высоту после прокрутки и сравниваем с максимально возможно прокруткой
         new_height = last_height + height_delta
         if max_height < new_height:
             driver.save_screenshot(f"{FOLDER_NAME}/{i}.png")
@@ -70,11 +91,4 @@ if __name__ == "__main__":
 
     driver.quit()
 
-    # Склеиваем скриншоты
-    img_list = list(map(lambda x: f'{FOLDER_NAME}/{x}.png', range(i + 1)))
-    images = list(map(cv2.imread, img_list))
-    # Обрезаем последний скриншот
-    images[-1] = images[-1][(window_size_y - last_screen_height) * 2:]
-    im_v = cv2.vconcat(images)
-    clear_folder(FOLDER_NAME)
-    cv2.imwrite(f'{FOLDER_NAME}/screenshot.jpg', im_v)
+    screen_shot.image_bonding(i, window_size_y, last_screen_height)
