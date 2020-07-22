@@ -3,7 +3,8 @@ from selenium import webdriver
 
 
 class ScreenshotBot:
-    SCROLL_PAUSE_TIME = 4
+    """ Класс для создания скриншотов при помози Selenium и Chrome в headless режиме """
+    SCROLL_PAUSE_TIME = 4  # Задаем время на скриншот после скрода
 
     def __init__(self, screenshot_url, screen_size_x, screen_size_y, folder_name='screenshots'):
         self.screenshot_url = screenshot_url
@@ -33,6 +34,7 @@ class ScreenshotBot:
         self.driver.quit()
 
     def get_max_scroll_depth(self):
+        """ Определяем количество необходимов скролов для принтскрина всего сайта"""
         self.driver.get(self.screenshot_url)
         self.max_height = self.driver.execute_script("return document.body.scrollHeight")
 
@@ -45,6 +47,7 @@ class ScreenshotBot:
         return self.screen_size_y, self.screen_num, self.last_screen_height
 
     def site_scrolling(self):
+        """ Реалезация метода скрол-принтскрин для последовательного принтскрина всех экранов """
         i = 0
         new_height = 0
         while True:
